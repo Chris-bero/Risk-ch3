@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introduction to Risk Management - Chapter 3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        navy: { 900: '#0f172a', 800: '#1e293b', 700: '#334155' },
+                        teal: { 500: '#14b8a6', 600: '#0d9488' },
+                        orange: { 500: '#f97316', 600: '#ea580c' },
+                        purple: { 500: '#a855f7', 600: '#9333ea' }
+                    },
+                    fontFamily: { sans: ['Inter', 'Tajawal', 'system-ui', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800&display=swap');
+        body { font-family: 'Inter', 'Tajawal', system-ui, sans-serif; background-color: #f8fafc; color: #1e293b; transition: background 0.3s, color 0.3s; }
+        .dark body { background-color: #0f172a; color: #f1f5f9; }
+        .dark .bg-white { background-color: #1e293b !important; }
+        .dark .bg-gray-50 { background-color: #334155 !important; }
+        .dark .text-navy-900 { color: #f8fafc !important; }
+        .dark .text-gray-600 { color: #cbd5e1 !important; }
+        .dark .text-gray-700 { color: #e2e8f0 !important; }
+        .dark .border-gray-100, .dark .border-gray-200 { border-color: #334155 !important; }
+
+        html[lang="ar"] body { font-family: 'Tajawal', 'Inter', system-ui, sans-serif; }
+        .hero-bg { background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); position: relative; overflow: hidden; }
+        .hero-bg::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(20,184,166,0.1) 0%, transparent 50%); animation: pulse 15s infinite alternate; }
+        @keyframes pulse { 0% { transform: translate(0, 0); } 100% { transform: translate(10%, 10%); } }
+        
+        .ar-block, .ar-inline { display: none; }
+        html[dir="rtl"] .en-block, html[dir="rtl"] .en-inline { display: none !important; }
+        html[dir="rtl"] .ar-block { display: block !important; }
+        html[dir="rtl"] .ar-inline { display: inline !important; }
+        html[dir="rtl"] table { text-align: right; }
+
+        #progress-bar { position: fixed; top: 0; left: 0; height: 4px; background: linear-gradient(90deg, #14b8a6, #f97316); z-index: 100; transition: width 0.1s linear; width: 0%; }
+
+        .tooltip-trigger { position: relative; cursor: help; border-bottom: 1px dashed currentColor; font-weight: 600; color: #0d9488; }
+        .dark .tooltip-trigger { color: #2dd4bf; }
+        .tooltip-trigger::after {
+            content: attr(data-tooltip); position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%);
+            background: #1e293b; color: white; padding: 8px 12px; border-radius: 8px;
+            font-size: 12px; font-weight: 400; width: 240px; text-align: center; opacity: 0; pointer-events: none;
+            transition: opacity 0.2s, transform 0.2s; z-index: 50; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            line-height: 1.4;
+        }
+        html[dir="rtl"] .tooltip-trigger::after { left: auto; right: 50%; transform: translateX(50%); }
+        .tooltip-trigger:hover::after { opacity: 1; transform: translateX(-50%) translateY(-5px); }
+        html[dir="rtl"] .tooltip-trigger:hover::after { transform: translateX(50%) translateY(-5px); }
+        
+        .math-block { font-family: 'Courier New', Courier, monospace; direction: ltr; text-align: left; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="progress-bar"></div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-1 z-50 bg-navy-900/95 dark:bg-navy-900 backdrop-blur-md border-b border-navy-700 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0 flex items-center gap-2">
+                    <svg class="w-8 h-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    <span class="text-white font-bold text-lg tracking-tight">
+                        <span class="en-inline">Risk Management</span>
+                        <span class="ar-inline">إدارة المخاطر</span>
+                    </span>
+                </div>
+                <div class="hidden md:flex items-center gap-2">
+                    <a href="#meaning" class="text-gray-300 hover:bg-navy-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition"><span class="en-inline">Meaning</span><span class="ar-inline">المعنى</span></a>
+                    <a href="#steps" class="text-gray-300 hover:bg-navy-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition"><span class="en-inline">Steps</span><span class="ar-inline">الخطوات</span></a>
+                    <a href="#coinsurance" class="text-gray-300 hover:bg-navy-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition"><span class="en-inline">Coinsurance</span><span class="ar-inline">التأمين المشترك</span></a>
+                    <a href="#prevention" class="text-gray-300 hover:bg-navy-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition"><span class="en-inline">Prevention</span><span class="ar-inline">المنع</span></a>
+                    <a href="#combined" class="text-gray-300 hover:bg-navy-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition"><span class="en-inline">Combined</span><span class="ar-inline">المدمج</span></a>
+                    <a href="#raroc" class="text-gray-300 hover:bg-navy-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition"><span class="en-inline">RAROC</span><span class="ar-inline">RAROC</span></a>
+                    <a href="#hlv" class="text-gray-300 hover:bg-navy-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition"><span class="en-inline">HLV</span><span class="ar-inline">HLV</span></a>
+                    <a href="#mcq" class="bg-orange-600 text-white hover:bg-orange-500 px-4 py-2 rounded-md text-sm font-medium transition shadow-md"><span class="en-inline">MCQ Quiz</span><span class="ar-inline">الاختبار</span></a>
+                    <button id="dark-mode-btn" class="p-2 text-gray-300 hover:text-white hover:bg-navy-700 rounded-md transition" title="Toggle Dark Mode">
+                        <svg id="icon-sun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <svg id="icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                    </button>
+                    <button id="lang-toggle" class="px-3 py-2 bg-white/10 hover:bg-white/20 text-white rounded-md text-sm font-bold transition border border-white/20 flex items-center gap-1.5">
+                        <span id="lang-label">AR</span>
+                    </button>
+                </div>
+                <div class="md:hidden flex items-center gap-2">
+                    <button id="dark-mode-btn-mob" class="p-2 text-white"><svg id="icon-moon-mob" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg></button>
+                    <button id="lang-toggle-mob" class="text-white p-2 bg-white/10 rounded-md text-xs font-bold border border-white/20"><span id="lang-label-mob">AR</span></button>
+                    <button id="mobile-menu-btn" class="text-gray-300 hover:text-white p-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-navy-800 border-t border-navy-700">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#meaning" class="text-gray-300 hover:bg-navy-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"><span class="en-inline">Meaning</span><span class="ar-inline">المعنى</span></a>
+                <a href="#steps" class="text-gray-300 hover:bg-navy-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"><span class="en-inline">Steps</span><span class="ar-inline">الخطوات</span></a>
+                <a href="#coinsurance" class="text-gray-300 hover:bg-navy-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"><span class="en-inline">Coinsurance</span><span class="ar-inline">التأمين المشترك</span></a>
+                <a href="#prevention" class="text-gray-300 hover:bg-navy-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"><span class="en-inline">Prevention</span><span class="ar-inline">المنع</span></a>
+                <a href="#combined" class="text-gray-300 hover:bg-navy-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"><span class="en-inline">Combined</span><span class="ar-inline">المدمج</span></a>
+                <a href="#raroc" class="text-gray-300 hover:bg-navy-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"><span class="en-inline">RAROC</span><span class="ar-inline">RAROC</span></a>
+                <a href="#hlv" class="text-gray-300 hover:bg-navy-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"><span class="en-inline">HLV</span><span class="ar-inline">HLV</span></a>
+                <a href="#mcq" class="bg-orange-600 text-white block px-3 py-2 rounded-md text-base font-medium text-center mt-2"><span class="en-inline">MCQ Quiz</span><span class="ar-inline">الاختبار</span></a>
+                <a href="#practice" class="bg-teal-600 text-white block px-3 py-2 rounded-md text-base font-medium text-center mt-1"><span class="en-inline">External Quiz</span><span class="ar-inline">أسئلة خارجية</span></a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero & Mind Map -->
+    <header class="hero-bg text-white py-16 md:py-24 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-20">
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
+                <span class="en-inline">Chapter 3: Introduction to Risk Management</span>
+                <span class="ar-inline">الفصل الثالث: مقدمة في إدارة المخاطر</span>
+            </h1>
+            <p class="text-xl text-gray-300 font-light max-w-3xl mx-auto mb-10">
+                <span class="en-inline">Interactive Module: Risk Process, Coinsurance, Loss Prevention, RAROC & HLV</span>
+                <span class="ar-inline">وحدة تفاعلية: عملية المخاطر، التأمين المشترك، منع الخسارة، RAROC و HLV</span>
+            </p>
+            
+            <div class="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20 max-w-6xl mx-auto">
+                <h3 class="text-sm font-bold text-teal-400 uppercase tracking-widest mb-4"><span class="en-inline">Concept Map</span><span class="ar-inline">الخريطة الذهنية</span></h3>
+                <div class="flex flex-col md:flex-row items-center justify-center gap-3 text-sm font-semibold flex-wrap">
+                    <div class="bg-teal-600 px-4 py-2 rounded-lg shadow-lg"><span class="en-inline">Risk Management Process</span><span class="ar-inline">عملية إدارة المخاطر</span></div>
+                    <svg class="w-6 h-6 text-gray-400 rotate-90 md:rotate-0 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                    <div class="bg-orange-600 px-4 py-2 rounded-lg shadow-lg"><span class="en-inline">Risk Control & Financing</span><span class="ar-inline">التحكم والتمويل</span></div>
+                    <svg class="w-6 h-6 text-gray-400 rotate-90 md:rotate-0 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                    <div class="bg-purple-600 px-4 py-2 rounded-lg shadow-lg"><span class="en-inline">Advanced Metrics</span><span class="ar-inline">المقاييس المتقدمة</span></div>
+                    <svg class="w-6 h-6 text-gray-400 rotate-90 md:rotate-0 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                    <div class="bg-navy-700 border border-teal-500 px-4 py-2 rounded-lg shadow-lg"><span class="en-inline">Personal Risk (HLV)</span><span class="ar-inline">المخاطر الشخصية (HLV)</span></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-24">
+
+        <!-- ========================================== -->
+        <!-- TOPIC 1: MEANING OF RISK MANAGEMENT        -->
+        <!-- ========================================== -->
+        <section id="meaning" class="scroll-mt-20">
+            <div class="text-center mb-10">
+                <span class="inline-block px-4 py-1 bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 text-xs font-bold rounded-full uppercase tracking-wider mb-3"><span class="en-inline">Topic 1</span><span class="ar-inline">الموضوع الأول</span></span>
+                <h2 class="text-3xl font-bold text-navy-900 dark:text-white">
+                    <span class="en-block">Meaning of Risk Management</span>
+                    <span class="ar-block">معنى إدارة المخاطر</span>
+                </h2>
+            </div>
+
+            <div class="bg-white dark:bg-navy-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-8">
+                <h3 class="text-xl font-bold text-navy-900 dark:text-white mb-4"><span class="en-block">Definition & Key Concepts</span><span class="ar-block">التعريف والمفاهيم الأساسية</span></h3>
+                <p class="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
+                    <span class="en-block"><span class="tooltip-trigger" data-tooltip="A process that identifies loss exposures faced by an organization and selects the most appropriate techniques for treating such exposures.">Risk Management</span> is a process that identifies <span class="tooltip-trigger" data-tooltip="Any situation or circumstance in which a loss is possible, regardless of whether a loss occurs.">loss exposures</span> faced by an organization and selects the most appropriate techniques for treating such exposures.</span>
+                    <span class="ar-block"><span class="tooltip-trigger" data-tooltip="عملية تحدد تعرضات الخسارة التي تواجهها المنظمة وتختار التقنيات الأنسب لمعالجة هذه التعرضات.">إدارة المخاطر</span> هي عملية تحدد <span class="tooltip-trigger" data-tooltip="أي موقف أو ظرف يكون فيه حدوث الخسارة ممكناً، بغض النظر عما إذا كانت الخسارة تحدث فعلياً.">تعرضات الخسارة</span> التي تواجهها المنظمة وتختار التقنيات الأنسب لمعالجة هذه التعرضات.</span>
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-4 mt-6">
+                    <div class="math-block bg-gray-50 dark:bg-navy-900 p-4 rounded-xl space-y-2 text-sm text-navy-900 dark:text-gray-200">
+                        <p class="font-bold text-teal-600 dark:text-teal-400 mb-2"><span class="en-inline">Core Formulas:</span><span class="ar-inline">المعادلات الأساسية:</span></p>
+                        <p><span class="text-gray-500">Expected Loss:</span> <span class="text-teal-600 dark:text-teal-400 font-bold">E(L) = ∑Pᵢ × Lᵢ</span></p>
+                        <p><span class="text-gray-500">Cost of Risk:</span> <span class="text-teal-600 dark:text-teal-400 font-bold">COR = Total Risk Costs / Revenue</span></p>
+                        <p><span class="text-gray-500">Loss Frequency:</span> <span class="text-teal-600 dark:text-teal-400 font-bold">λ = Number of Losses / Time Period</span></p>
+                        <p><span class="text-gray-500">Loss Severity:</span> <span class="text-teal-600 dark:text-teal-400 font-bold">μ = Total Loss Amount / Number of Losses</span></p>
+                        <p><span class="text-gray-500">Risk Score:</span> <span class="text-orange-600 dark:text-orange-400 font-bold">E(AL) = λ × μ</span></p>
+                        <p><span class="text-gray-500">Insurance Payment:</span> <span class="text-orange-600 dark:text-orange-400 font-bold">max(0, Loss − Deductible)</span></p>
+                    </div>
+                    <div class="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-xl border border-orange-200 dark:border-orange-800">
+                        <h4 class="font-bold text-orange-800 dark:text-orange-300 mb-2"><span class="en-inline">Cost of Risk Components:</span><span class="ar-inline">مكونات تكلفة المخاطر:</span></h4>
+                        <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                            <li>• <span class="en-inline">Insurance premiums</span><span class="ar-inline">أقساط التأمين</span></li>
+                            <li>• <span class="en-inline">Retained losses</span><span class="ar-inline">الخسائر المحتفظ بها</span></li>
+                            <li>• <span class="en-inline">Risk control costs</span><span class="ar-inline">تكاليف التحكم في المخاطر</span></li>
+                            <li>• <span class="en-inline">Administrative costs</span><span class="ar-inline">التكاليف الإدارية</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Objectives -->
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h3 class="text-xl font-bold text-navy-900 dark:text-white mb-4"><span class="en-block">Objectives of Risk Management</span><span class="ar-block">أهداف إدارة المخاطر</span></h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-teal-50 dark:bg-teal-900/20 rounded-xl border border-teal-200 dark:border-teal-800">
+                            <h4 class="font-bold text-teal-800 dark:text-teal-300 mb-2"><span class="en-inline">Pre-loss Objectives:</span><span class="ar-inline">الأهداف قبل الخسارة:</span></h4>
+                            <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                                <li>• <span class="en-inline"><strong>Economy:</strong> Prepare for losses most economically</span><span class="ar-inline"><strong>الاقتصاد:</strong> الاستعداد للخسائر بأكثر الطرق اقتصادية</span></li>
+                                <li>• <span class="en-inline"><strong>Anxiety Reduction:</strong> Minimize worry and fear</span><span class="ar-inline"><strong>تقليل القلق:</strong> تقليل القلق والخوف</span></li>
+                                <li>• <span class="en-inline"><strong>Legal Compliance:</strong> Meet statutory requirements</span><span class="ar-inline"><strong>الامتثال القانوني:</strong> تلبية المتطلبات القانونية</span></li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-xl border border-orange-200 dark:border-orange-800">
+                            <h4 class="font-bold text-orange-800 dark:text-orange-300 mb-2"><span class="en-inline">Post-loss Objectives:</span><span class="ar-inline">الأهداف بعد الخسارة:</span></h4>
+                            <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                                <li>• <span class="en-inline"><strong>Survival:</strong> Firm continues to exist</span><span class="ar-inline"><strong>البقاء:</strong> استمرار الشركة في الوجود</span></li>
+                                <li>• <span class="en-inline"><strong>Continuity:</strong> Maintain operations</span><span class="ar-inline"><strong>الاستمرارية:</strong> الحفاظ على العمليات</span></li>
+                                <li>• <span class="en-inline"><strong>Earnings Stability:</strong> Minimize earnings volatility</span><span class="ar-inline"><strong>استقرار الأرباح:</strong> تقليل تقلب الأرباح</span></li>
+                                <li>• <span class="en-inline"><strong>Growth:</strong> Continue organizational growth</span><span class="ar-inline"><strong>النمو:</strong> الاستمرار في النمو التنظيمي</span></li>
+                                <li>• <span class="en-inline"><strong>Social Responsibility:</strong> Minimize impact on others</span><span class="ar-inline"><strong>المسؤولية الاجتماعية:</strong> تقليل التأثير على الآخرين</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COR Example -->
+                <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h3 class="text-xl font-bold text-navy-900 dark:text-white mb-4"><span class="en-block">Example: Cost of Risk (COR)</span><span class="ar-block">مثال: تكلفة المخاطر (COR)</span></h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                        <span class="en-block">A manufacturing firm has annual revenue of $50,000,000. Its risk management costs for the year are:</span>
+                        <span class="ar-block">شركة تصنيع لديها إيرادات سنوية بقيمة 50,000,000 دولار. تكاليف إدارة المخاطر لهذا العام هي:</span>
+                    </p>
+                    <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-1 mb-4">
+                        <li>• <span class="en-inline">Insurance premiums: $800,000</span><span class="ar-inline">أقساط التأمين: 800,000 دولار</span></li>
+                        <li>• <span class="en-inline">Retained losses: $200,000</span><span class="ar-inline">الخسائر المحتفظ بها: 200,000 دولار</span></li>
+                        <li>• <span class="en-inline">Risk control costs: $300,000</span><span class="ar-inline">تكاليف التحكم في المخاطر: 300,000 دولار</span></li>
+                        <li>• <span class="en-inline">Administrative costs: $150,000</span><span class="ar-inline">التكاليف الإدارية: 150,000 دولار</span></li>
+                    </ul>
+                    <button onclick="toggleMath('cor-ex')" class="w-full sm:w-auto py-2.5 px-6 bg-orange-600 hover:bg-orange-500 text-white font-semibold rounded-lg transition text-sm flex items-center justify-center gap-2">
+                        <span class="en-inline">Reveal Solution</span>
+                        <span class="ar-inline">عرض الحل</span>
+                    </button>
+                    <div id="cor-ex" class="hidden mt-4 p-4 bg-gray-50 dark:bg-navy-900 rounded-xl math-block text-sm space-y-2 text-navy-900 dark:text-gray-200">
+                        <p>Total Risk Costs = 800,000 + 200,000 + 300,000 + 150,000 = <span class="text-teal-600 dark:text-teal-400 font-bold">$1,450,000</span></p>
+                        <p>COR = 1,450,000 / 50,000,000 = <span class="text-orange-600 dark:text-orange-400 font-bold">0.029 = 2.9%</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk Score Example -->
+            <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <h3 class="text-xl font-bold text-navy-900 dark:text-white mb-4"><span class="en-block">Example: Risk Score Ranking</span><span class="ar-block">مثال: ترتيب نقاط المخاطر</span></h3>
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                    <span class="en-block">A risk manager at a retail company identified four loss exposures. For each, the frequency per year and average severity are given. Calculate the expected annual loss and risk score for each exposure. Rank the exposures by importance.</span>
+                    <span class="ar-block">حدد مدير المخاطر في شركة تجزئة أربعة تعرضات للخسارة. لكل منها التكرار سنوياً ومتوسط الشدة. احسب الخسارة السنوية المتوقعة ونقطة المخاطر لكل تعرض. رتب التعرضات حسب الأهمية.</span>
+                </p>
+                <button onclick="toggleMath('risk-score')" class="w-full sm:w-auto py-2.5 px-6 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-lg transition text-sm flex items-center justify-center gap-2 mb-4">
+                    <span class="en-inline">Reveal Solution</span>
+                    <span class="ar-inline">عرض الحل</span>
+                </button>
+                <div id="risk-score" class="hidden overflow-x-auto">
+                    <table class="w-full text-start border border-gray-200 dark:border-gray-600">
+                        <thead class="bg-gray-50 dark:bg-navy-900">
+                            <tr>
+                                <th class="px-4 py-2 border-b"><span class="en-inline">Exposure</span><span class="ar-inline">التعرض</span></th>
+                                <th class="px-4 py-2 border-b"><span class="en-inline">Frequency (λ)</span><span class="ar-inline">التكرار (λ)</span></th>
+                                <th class="px-4 py-2 border-b"><span class="en-inline">Severity ($)</span><span class="ar-inline">الشدة ($)</span></th>
+                                <th class="px-4 py-2 border-b"><span class="en-inline">Risk Score E(AL)</span><span class="ar-inline">نقطة المخاطر E(AL)</span></th>
+                                <th class="px-4 py-2 border-b"><span class="en-inline">Rank</span><span class="ar-inline">الترتيب</span></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
+                            <tr><td class="px-4 py-2"><span class="en-inline">Fire</span><span class="ar-inline">الحريق</span></td><td class="px-4 py-2">0.05</td><td class="px-4 py-2">500,000</td><td class="px-4 py-2 text-teal-600 dark:text-teal-400 font-bold">25,000</td><td class="px-4 py-2">2</td></tr>
+                            <tr><td class="px-4 py-2"><span class="en-inline">Theft</span><span class="ar-inline">السرقة</span></td><td class="px-4 py-2">0.50</td><td class="px-4 py-2">10,000</td><td class="px-4 py-2 text-teal-600 dark:text-teal-400 font-bold">5,000</td><td class="px-4 py-2">3</td></tr>
+                            <tr class="bg-orange-50 dark:bg-orange-900/20"><td class="px-4 py-2"><span class="en-inline">Liability</span><span class="ar-inline">المسؤولية</span></td><td class="px-4 py-2">0.10</td><td class="px-4 py-2">1,000,000</td><td class="px-4 py-2 text-orange-600 dark:text-orange-400 font-bold">100,000</td><td class="px-4 py-2 font-bold">1</td></tr>
+                            <tr><td class="px-4 py-2"><span class="en-inline">Flood</span><span class="ar-inline">الفيضان</span></td><td class="px-4 py-2">0.02</td><td class="px-4 py-2">250,000</td><td class="px-4 py-2 text-teal-600 dark:text-teal-400 font-bold">5,000</td><td class="px-4 py-2">3</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TOPIC 2: STEPS IN RISK MANAGEMENT PROCESS  -->
+        <!-- ========================================== -->
+        <section id="steps" class="scroll-mt-20">
+            <div class="text-center mb-10">
+                <span class="inline-block px-4 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs font-bold rounded-full uppercase tracking-wider mb-3"><span class="en-inline">Topic 2</span><span class="ar-inline">الموضوع الثاني</span></span>
+                <h2 class="text-3xl font-bold text-navy-900 dark:text-white">
+                    <span class="en-block">Steps in the Risk Management Process</span>
+                    <span class="ar-block">خطوات عملية إدارة المخاطر</span>
+                </h2>
+            </div>
+
+            <!-- 4 Steps -->
+            <div class="grid md:grid-cols-4 gap-4 mb-10">
+                <div class="bg-white dark:bg-navy-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 border-t-4 border-t-teal-500">
+                    <div class="w-10 h-10 bg-teal-600 text-white rounded-full flex items-center justify-center font-bold mb-3">1</div>
+                    <h4 class="font-bold text-navy-900 dark:text-white mb-2"><span class="en-inline">Identify</span><span class="ar-inline">التحديد</span></h4>
+                    <p class="text-xs text-gray-600 dark:text-gray-300"><span class="en-inline">Identify potential losses using questionnaires, inspections, flowcharts, financial statements, audits.</span><span class="ar-inline">تحديد الخسائر المحتملة باستخدام الاستبيانات، التفتيش، المخططات الانسيابية، البيانات المالية، التدقيق.</span></p>
+                </div>
+                <div class="bg-white dark:bg-navy-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 border-t-4 border-t-orange-500">
+                    <div class="w-10 h-10 bg-orange-600 text-white rounded-full flex items-center justify-center font-bold mb-3">2</div>
+                    <h4 class="font-bold text-navy-900 dark:text-white mb-2"><span class="en-inline">Measure & Analyze</span><span class="ar-inline">القياس والتحليل</span></h4>
+                    <p class="text-xs text-gray-600 dark:text-gray-300"><span class="en-inline">Calculate Loss Frequency (λ), Severity (μ), and Risk Score E(AL) = λ × μ.</span><span class="ar-inline">حساب تكرار الخسارة (λ)، الشدة (μ)، ونقطة المخاطر E(AL) = λ × μ.</span></p>
+                </div>
+                <div class="bg-white dark:bg-navy-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 border-t-4 border-t-purple-500">
+                    <div class="w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold mb-3">3</div>
+                    <h4 class="font-bold text-navy-900 dark:text-white mb-2"><span class="en-inline">Select Techniques</span><span class="ar-inline">اختيار التقنيات</span></h4>
+                    <p class="text-xs text-gray-600 dark:text-gray-300"><span class="en-inline">Risk Control (Avoidance, Prevention, Reduction, Duplication, Separation, Diversification) + Risk Financing (Retention, Transfer, Insurance).</span><span class="ar-inline">التحكم في المخاطر (التجنب، المنع، التقليل، الازدواجية، الفصل، التنويع) + تمويل المخاطر (الاحتفاظ، النقل، التأمين).</span></p>
+                </div>
+                <div class="bg-white dark:bg-navy-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 border-t-4 border-t-blue-500">
+                    <div class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mb-3">4</div>
+                    <h4 class="font-bold text-navy-900 dark:text-white mb-2"><span class="en-inline">Implement & Monitor</span><span class="ar-inline">التنفيذ والمراقبة</span></h4>
+                    <p class="text-xs text-gray-600 dark:text-gray-300"><span class="en-inline">Implement via risk management policy statement, manual, and continuous monitoring.</span><span class="ar-inline">التنفيذ عبر بيان سياسة إدارة المخاطر، الدليل، والمراقبة المستمرة.</span></p>
+                </div>
+            </div>
+
+            <!-- Risk Control vs Financing -->
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h3 class="text-xl font-bold text-teal-700 dark:text-teal-400 mb-4"><span class="en-inline">Risk Control Techniques</span><span class="ar-inline">تقنيات التحكم في المخاطر</span></h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3"><span class="en-inline">Techniques that reduce the <strong>frequency and severity</strong> of losses:</span><span class="ar-inline">التقنيات التي تقلل من <strong>تكرار وشدة</strong> الخسائر:</span></p>
+                    <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                        <li><strong><span class="en-inline">Avoidance:</span><span class="ar-inline">التجنب:</span></strong> <span class="en-inline">Never undertaking or abandoning a loss exposure (chance of loss = 0).</span><span class="ar-inline">عدم القيام بتعرض الخسارة أو التخلي عنه (احتمال الخسارة = 0).</span></li>
+                        <li><strong><span class="en-inline">Loss Prevention:</span><span class="ar-inline">منع الخسارة:</span></strong> <span class="en-inline">Measures to reduce frequency (e.g., safety features).</span><span class="ar-inline">إجراءات لتقليل التكرار (مثل ميزات السلامة).</span></li>
+                        <li><strong><span class="en-inline">Loss Reduction:</span><span class="ar-inline">تقليل الخسارة:</span></strong> <span class="en-inline">Measures to reduce severity after loss (e.g., sprinklers).</span><span class="ar-inline">إجراءات لتقليل الشدة بعد الخسارة (مثل الرشاشات).</span></li>
+                        <li><strong><span class="en-inline">Duplication:</span><span class="ar-inline">الازدواجية:</span></strong> <span class="en-inline">Having back-ups or copies of important documents/property.</span><span class="ar-inline">وجود نسخ احتياطية من المستندات/الممتلكات المهمة.</span></li>
+                        <li><strong><span class="en-inline">Separation:</span><span class="ar-inline">الفصل:</span></strong> <span class="en-inline">Dividing assets to minimize harm from a single event.</span><span class="ar-inline">تقسيم الأصول لتقليل الضرر من حدث واحد.</span></li>
+                        <li><strong><span class="en-inline">Diversification:</span><span class="ar-inline">التنويع:</span></strong> <span class="en-inline">Spreading loss exposure across different parties/securities.</span><span class="ar-inline">نشر تعرض الخسارة عبر أطراف/أوراق مالية مختلفة.</span></li>
+                    </ul>
+                </div>
+                <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h3 class="text-xl font-bold text-orange-700 dark:text-orange-400 mb-4"><span class="en-inline">Risk Financing Techniques</span><span class="ar-inline">تقنيات تمويل المخاطر</span></h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3"><span class="en-inline">Techniques that provide for the <strong>payment of losses</strong> after they occur:</span><span class="ar-inline">التقنيات التي توفر <strong>دفع الخسائر</strong> بعد حدوثها:</span></p>
+                    <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                        <li><strong><span class="en-inline">Retention:</span><span class="ar-inline">الاحتفاظ:</span></strong> <span class="en-inline">Firm retains part or all of losses. Methods: net income, unfunded reserve, funded reserve, credit line.</span><span class="ar-inline">تحتفظ الشركة بجزء أو كل الخسائر. الطرق: الدخل الصافي، احتياطي غير ممول، احتياطي ممول، خط ائتمان.</span></li>
+                        <li><strong><span class="en-inline">Captive Insurer:</span><span class="ar-inline">شركة تأمين تابعة:</span></strong> <span class="en-inline">An insurer owned by a parent firm to insure its own loss exposures.</span><span class="ar-inline">شركة تأمين مملوكة لشركة أم لتأمين تعرضات الخسارة الخاصة بها.</span></li>
+                        <li><strong><span class="en-inline">Non-insurance Transfer:</span><span class="ar-inline">النقل غير التأميني:</span></strong> <span class="en-inline">Transfer via contracts, leases, hedging, incorporation.</span><span class="ar-inline">النقل عبر العقود، الإيجارات، التحوط، الدمج.</span></li>
+                        <li><strong><span class="en-inline">Commercial Insurance:</span><span class="ar-inline">التأمين التجاري:</span></strong> <span class="en-inline">Transfer to insurer. Appropriate for low-probability, high-severity exposures.</span><span class="ar-inline">النقل إلى شركة التأمين. مناسب للتعرضات منخفضة الاحتمال وعالية الشدة.</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Deductible Examples -->
+            <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-8">
+                <h3 class="text-xl font-bold text-navy-900 dark:text-white mb-4"><span class="en-block">Example: Insurance Payment with Deductible</span><span class="ar-block">مثال: دفع التأمين مع الخصم</span></h3>
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                    <span class="en-block">Formula: <strong class="math-block">Payment = max(0, Loss − Deductible)</strong></span>
+                    <span class="ar-block">المعادلة: <strong class="math-block">الدفع = max(0, الخسارة − الخصم)</strong></span>
+                </p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="p-4 bg-gray-50 dark:bg-navy-900 rounded-xl">
+                        <p class="font-semibold text-navy-900 dark:text-white mb-2"><span class="en-inline">Example 1: Maya's Printing Shop</span><span class="ar-inline">مثال 1: متجر مايا للطباعة</span></p>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 mb-2"><span class="en-inline">Loss = $45,000. Deductible = $10,000.</span><span class="ar-inline">الخسارة = 45,000 دولار. الخصم = 10,000 دولار.</span></p>
+                        <button onclick="toggleMath('ded1')" class="w-full py-2 px-4 bg-orange-600 hover:bg-orange-500 text-white font-semibold rounded-lg transition text-xs flex items-center justify-center gap-2">
+                            <span class="en-inline">Reveal Solution</span><span class="ar-inline">عرض الحل</span>
+                        </button>
+                        <div id="ded1" class="hidden mt-3 math-block text-xs space-y-1 text-navy-900 dark:text-gray-200">
+                            <p>Payment = max(0, 45,000 − 10,000) = <span class="text-teal-600 dark:text-teal-400 font-bold">$35,000</span></p>
+                            <p>Insurer pays <span class="text-orange-600 dark:text-orange-400 font-bold">$35,000</span></p>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-gray-50 dark:bg-navy-900 rounded-xl">
+                        <p class="font-semibold text-navy-900 dark:text-white mb-2"><span class="en-inline">Example 2: Daniel's Home</span><span class="ar-inline">مثال 2: منزل دانيال</span></p>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 mb-2"><span class="en-inline">Loss = $8,000. Deductible = $12,000.</span><span class="ar-inline">الخسارة = 8,000 دولار. الخصم = 12,000 دولار.</span></p>
+                        <button onclick="toggleMath('ded2')" class="w-full py-2 px-4 bg-orange-600 hover:bg-orange-500 text-white font-semibold rounded-lg transition text-xs flex items-center justify-center gap-2">
+                            <span class="en-inline">Reveal Solution</span><span class="ar-inline">عرض الحل</span>
+                        </button>
+                        <div id="ded2" class="hidden mt-3 math-block text-xs space-y-1 text-navy-900 dark:text-gray-200">
+                            <p>Payment = max(0, 8,000 − 12,000) = <span class="text-teal-600 dark:text-teal-400 font-bold">$0</span></p>
+                            <p>Insurer pays <span class="text-red-600 dark:text-red-400 font-bold">$0</span> (loss below deductible)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Micro Quiz -->
+            <div class="bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 p-5 rounded-xl">
+                <h4 class="font-bold text-teal-800 dark:text-teal-300 mb-3 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span class="en-inline">Quick Check: Installing an automatic sprinkler system is an example of:</span>
+                    <span class="ar-inline">تحقق سريع: تركيب نظام رشاشات تلقائية هو مثال على:</span>
+                </h4>
+                <div class="flex flex-wrap gap-2" id="micro-quiz-sprinkler">
+                    <button onclick="checkMicro('micro-quiz-sprinkler', this, false)" class="px-4 py-2 bg-white dark:bg-navy-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm font-medium hover:bg-teal-100 dark:hover:bg-teal-900 transition"><span class="en-inline">Avoidance</span><span class="ar-inline">التجنب</span></button>
+                    <button onclick="checkMicro('micro-quiz-sprinkler', this, false)" class="px-4 py-2 bg-white dark:bg-navy-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm font-medium hover:bg-teal-100 dark:hover:bg-teal-900 transition"><span class="en-inline">Loss Prevention</span><span class="ar-inline">منع الخسارة</span></button>
+                    <button onclick="checkMicro('micro-quiz-sprinkler', this, true)" class="px-4 py-2 bg-white dark:bg-navy-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm font-medium hover:bg-teal-100 dark:hover:bg-teal-900 transition"><span class="en-inline">Loss Reduction</span><span class="ar-inline">تقليل الخسارة</span></button>
+                    <button onclick="checkMicro('micro-quiz-sprinkler', this, false)" class="px-4 py-2 bg-white dark:bg-navy-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm font-medium hover:bg-teal-100 dark:hover:bg-teal-900 transition"><span class="en-inline">Retention</span><span class="ar-inline">الاحتفاظ</span></button>
+                </div>
+                <div id="micro-quiz-sprinkler-feedback" class="hidden mt-3 text-sm font-medium"></div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TOPIC 3: CO-INSURANCE PAYMENT              -->
+        <!-- ========================================== -->
+        <section id="coinsurance" class="scroll-mt-20">
+            <div class="text-center mb-10">
+                <span class="inline-block px-4 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-bold rounded-full uppercase tracking-wider mb-3"><span class="en-inline">Topic 3</span><span class="ar-inline">الموضوع الثالث</span></span>
+                <h2 class="text-3xl font-bold text-navy-900 dark:text-white">
+                    <span class="en-block">Co-Insurance Payment</span>
+                    <span class="ar-block">دفع التأمين المشترك</span>
+                </h2>
+            </div>
+
+            <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-8">
+                <p class="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
+                    <span class="en-block">A <span class="tooltip-trigger" data-tooltip="Requires the insured to buy a minimum percentage of property value. If less, payment is reduced proportionally.">coinsurance clause</span> requires the insured to buy a minimum percentage of property value. If the insured buys less than required, payment is reduced proportionally; this penalizes underinsurance.</span>
+                    <span class="ar-block">يتطلب <span class="tooltip-trigger" data-tooltip="يطلب من المؤمن له شراء نسبة مئوية دنيا من قيمة الممتلكات. إذا اشترى أقل، يتم تقليل الدفع بشكل متناسب.">بند التأمين المشترك</span> من المؤمن له شراء نسبة مئوية دنيا من قيمة الممتلكات. إذا اشترى المؤمن له أقل من المطلوب، يتم تقليل الدفع بشكل متناسب؛ وهذا يعاقب على نقص التأمين.</span>
+                </p>
+                <div class="math-block bg-gray-50 dark:bg-navy-900 p-4 rounded-xl space-y-2 text-sm text-navy-900 dark:text-gray-200">
+                    <p><span class="text-gray-500">Required Insurance:</span> <span class="text-teal-600 dark:text-teal-400 font-bold">Coinsurance% × Property Value</span></p>
+                    <p><span class="text-gray-500">Payment:</span> <span class="text-orange-600 dark:text-orange-400 font-bold">Loss × (Insurance Purchased / Insurance Required)</span></p>
+                </div>
+            </div>
+
+            <!-- Co-Insurance Examples -->
+            <div class="space-y-6">
+                <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h4 class="font-bold text-navy-900 dark:text-white mb-2"><span class="en-inline">Example 1: Warehouse Owner</span><span class="ar-inline">مثال 1: صاحب مستودع</span></h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                        <span class="en-block">A warehouse owner has a building valued at $500,000. The property insurance policy contains an 80% coinsurance clause. The owner purchases only $350,000 of coverage. A fire causes $80,000 in damage. There is no deductible. How much will the insurer pay?</span>
+                        <span class="ar-block">يملك صاحب مستودع مبنى بقيمة 500,000 دولار. تحتوي بوليصة تأمين الممتلكات على بند تأمين مشترك بنسبة 80%. اشترى المالك تغطية بقيمة 350,000 دولار فقط. تسبب حريق في أضرار بقيمة 80,000 دولار. لا يوجد خصم. كم سيدفع المؤمن؟</span>
+                    </p>
+                    <button onclick="toggleMath('coin1')" class="w-full sm:w-auto py-2.5 px-6 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-lg transition text-sm flex items-center justify-center gap-2">
+                        <span class="en-inline">Reveal Solution</span>
+                        <span class="ar-inline">عرض الحل</span>
+                    </button>
+                    <div id="coin1" class="hidden mt-4 p-4 bg-gray-50 dark:bg-navy-900 rounded-xl math-block text-sm space-y-2 text-navy-900 dark:text-gray-200">
+                        <p>Required Insurance = 0.80 × 500,000 = <span class="text-teal-600 dark:text-teal-400 font-bold">$400,000</span></p>
+                        <p>Payment = 80,000 × (350,000 / 400,000) = <span class="text-orange-600 dark:text-orange-400 font-bold">$70,000</span></p>
+                        <p class="text-red-600 dark:text-red-400 pt-2 border-t border-gray-200 dark:border-gray-600">The insurer will pay <strong>$70,000</strong>. The owner bears $10,000 penalty for underinsurance.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h4 class="font-bold text-navy-900 dark:text-white mb-2"><span class="en-inline">Example 2: Apartment Building</span><span class="ar-inline">مثال 2: مبنى شقق</span></h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                        <span class="en-block">An apartment building owner has a property valued at $2,000,000. The insurance policy includes a 90% coinsurance clause. The owner buys $1,500,000 of coverage. A fire causes $300,000 in damage. There is no deductible. Calculate the insurer's payment.</span>
+                        <span class="ar-block">يملك صاحب مبنى شقق عقاراً بقيمة 2,000,000 دولار. تتضمن بوليصة التأمين بند تأمين مشترك بنسبة 90%. اشترى المالك تغطية بقيمة 1,500,000 دولار. تسبب حريق في أضرار بقيمة 300,000 دولار. لا يوجد خصم. احسب دفع المؤمن.</span>
+                    </p>
+                    <button onclick="toggleMath('coin2')" class="w-full sm:w-auto py-2.5 px-6 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-lg transition text-sm flex items-center justify-center gap-2">
+                        <span class="en-inline">Reveal Solution</span>
+                        <span class="ar-inline">عرض الحل</span>
+                    </button>
+                    <div id="coin2" class="hidden mt-4 p-4 bg-gray-50 dark:bg-navy-900 rounded-xl math-block text-sm space-y-2 text-navy-900 dark:text-gray-200">
+                        <p>Required Insurance = 0.90 × 2,000,000 = <span class="text-teal-600 dark:text-teal-400 font-bold">$1,800,000</span></p>
+                        <p>Payment = 300,000 × (1,500,000 / 1,800,000) = 300,000 × (5/6) = <span class="text-orange-600 dark:text-orange-400 font-bold">$250,000</span></p>
+                        <p class="text-red-600 dark:text-red-400 pt-2 border-t border-gray-200 dark:border-gray-600">The insurer will pay <strong>$250,000</strong>. The owner bears $50,000 penalty for underinsurance.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TOPIC 4: LOSS PREVENTION COST-BENEFIT      -->
+        <!-- ========================================== -->
+        <section id="prevention" class="scroll-mt-20">
+            <div class="text-center mb-10">
+                <span class="inline-block px-4 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-bold rounded-full uppercase tracking-wider mb-3"><span class="en-inline">Topic 4</span><span class="ar-inline">الموضوع الرابع</span></span>
+                <h2 class="text-3xl font-bold text-navy-900 dark:text-white">
+                    <span class="en-block">Loss Prevention - Cost-Benefit Analysis</span>
+                    <span class="ar-block">منع الخسارة - تحليل التكلفة والعائد</span>
+                </h2>
+            </div>
+
+            <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-8">
+                <p class="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
+                    <span class="en-block">A risk manager should implement a loss prevention program only if the <span class="tooltip-trigger" data-tooltip="The financial benefit of the program minus its cost. If positive, implement; if negative, don't implement.">net benefit</span> is positive.</span>
+                    <span class="ar-block">يجب على مدير المخاطر تنفيذ برنامج منع الخسارة فقط إذا كانت <span class="tooltip-trigger" data-tooltip="الفائدة المالية للبرنامج مطروحاً منها تكلفته. إذا كانت موجبة، نفذ؛ إذا كانت سالبة، لا تنفذ.">الفائدة الصافية</span> موجبة.</span>
+                </p>
+                <div class="math-block bg-gray-50 dark:bg-navy-900 p-4 rounded-xl space-y-2 text-sm text-navy-900 dark:text-gray-200">
+                    <p><span class="text-gray-500">Net Benefit:</span> <span class="text-teal-600 dark:text-teal-400 font-bold">[E(L)before − E(L)after] − Prevention Cost</span></p>
+                    <p><span class="text-gray-500">Or:</span> <span class="text-teal-600 dark:text-teal-400 font-bold">(ΔFrequency × Severity) − Prevention Cost</span></p>
+                </div>
+            </div>
+
+            <!-- Prevention Examples -->
+            <div class="space-y-6">
+                <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h4 class="font-bold text-navy-900 dark:text-white mb-2"><span class="en-inline">Example 1: Distribution Center Safety Training</span><span class="ar-inline">مثال 1: تدريب السلامة في مركز التوزيع</span></h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                        <span class="en-block">A distribution center currently experiences losses with a frequency of 0.25 per year and an average severity of $80,000. The risk manager proposes a new safety training program that is expected to reduce the frequency to 0.10 per year, while severity remains $80,000. The program costs $5,000 per year. Calculate the net benefit and decide whether to implement the program.</span>
+                        <span class="ar-block">يعاني مركز توزيع حالياً من خسائر بتكرار 0.25 سنوياً ومتوسط شدة 80,000 دولار. يقترح مدير المخاطر برنامج تدريب سلامة جديد يتوقع أن يقلل التكرار إلى 0.10 سنوياً، بينما تبقى الشدة 80,000 دولار. يكلف البرنامج 5,000 دولار سنوياً. احسب الفائدة الصافية وقرر ما إذا كان يجب تنفيذ البرنامج.</span>
+                    </p>
+                    <button onclick="toggleMath('prev1')" class="w-full sm:w-auto py-2.5 px-6 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition text-sm flex items-center justify-center gap-2">
+                        <span class="en-inline">Reveal Solution</span>
+                        <span class="ar-inline">عرض الحل</span>
+                    </button>
+                    <div id="prev1" class="hidden mt-4 p-4 bg-gray-50 dark:bg-navy-900 rounded-xl math-block text-sm space-y-2 text-navy-900 dark:text-gray-200">
+                        <p>E(L)before = 0.25 × 80,000 = <span class="text-teal-600 dark:text-teal-400 font-bold">$20,000</span></p>
+                        <p>E(L)after = 0.10 × 80,000 = <span class="text-teal-600 dark:text-teal-400 font-bold">$8,000</span></p>
+                        <p>Savings = 20,000 − 8,000 = <span class="text-teal-600 dark:text-teal-400 font-bold">$12,000</span></p>
+                        <p>Net Benefit = 12,000 − 5,000 = <span class="text-green-600 dark:text-green-400 font-bold">$7,000</span></p>
+                        <p class="text-green-600 dark:text-green-400 pt-2 border-t border-gray-200 dark:border-gray-600">✅ <strong>Decision: IMPLEMENT the program</strong> (Net Benefit > 0)</p>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h4 class="font-bold text-navy-900 dark:text-white mb-2"><span class="en-inline">Example 2: Retail Chain Prevention Program</span><span class="ar-inline">مثال 2: برنامج منع سلسلة تجزئة</span></h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                        <span class="en-block">A retail chain has a loss exposure with an annual frequency of 0.50 and an average severity of $12,000. A proposed loss prevention program would reduce the frequency to 0.30, with severity unchanged at $12,000. The program costs $3,000 per year. Should the company implement the program?</span>
+                        <span class="ar-block">لدى سلسلة تجزئة تعرض خسارة بتكرار سنوي 0.50 ومتوسط شدة 12,000 دولار. برنامج منع الخسارة المقترح سيقلل التكرار إلى 0.30، مع بقاء الشدة دون تغيير عند 12,000 دولار. يكلف البرنامج 3,000 دولار سنوياً. هل يجب على الشركة تنفيذ البرنامج؟</span>
+                    </p>
+                    <button onclick="toggleMath('prev2')" class="w-full sm:w-auto py-2.5 px-6 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition text-sm flex items-center justify-center gap-2">
+                        <span class="en-inline">Reveal Solution</span>
+                        <span class="ar-inline">عرض الحل</span>
+                    </button>
+                    <div id="prev2" class="hidden mt-4 p-4 bg-gray-50 dark:bg-navy-900 rounded-xl math-block text-sm space-y-2 text-navy-900 dark:text-gray-200">
+                        <p>E(L)before = 0.50 × 12,000 = <span class="text-teal-600 dark:text-teal-400 font-bold">$6,000</span></p>
+                        <p>E(L)after = 0.30 × 12,000 = <span class="text-teal-600 dark:text-teal-400 font-bold">$3,600</span></p>
+                        <p>Savings = 6,000 − 3,600 = <span class="text-teal-600 dark:text-teal-400 font-bold">$2,400</span></p>
+                        <p>Net Benefit = 2,400 − 3,000 = <span class="text-red-600 dark:text-red-400 font-bold">−$600</span></p>
+                        <p class="text-red-600 dark:text-red-400 pt-2 border-t border-gray-200 dark:border-gray-600">❌ <strong>Decision: DO NOT implement</strong> (Net Benefit < 0)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TOPIC 5: COMBINED RISK REDUCTION           -->
+        <!-- ========================================== -->
+        <section id="combined" class="scroll-mt-20">
+            <div class="text-center mb-10">
+                <span class="inline-block px-4 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-full uppercase tracking-wider mb-3"><span class="en-inline">Topic 5</span><span class="ar-inline">الموضوع الخامس</span></span>
+                <h2 class="text-3xl font-bold text-navy-900 dark:text-white">
+                    <span class="en-block">Combined Risk Reduction (Layered Protection)</span>
+                    <span class="ar-block">تقليل المخاطر المدمج (الحماية الطبقاتية)</span>
+                </h2>
+            </div>
+
+            <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-8">
+                <p class="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
+                    <span class="en-block">When firms implement independent risk control measures (layered), the combined reduction is calculated by multiplying the remaining risk proportions. <strong>Layering can greatly reduce risk, but never to exactly zero.</strong></span>
+                    <span class="ar-block">عندما تنفذ الشركات تدابير مستقلة للتحكم في المخاطر (طبقات)، يتم حساب التقليل المدمج عن طريق ضرب نسب المخاطر المتبقية. <strong>الطبقاتية يمكن أن تقلل المخاطر بشكل كبير، ولكن أبداً إلى الصفر تماماً.</strong></span>
+                </p>
+                <div class="math-block bg-gray-50 dark:bg-navy-900 p-4 rounded-xl text-sm text-navy-900 dark:text-gray-200">
+                    <p><span class="text-gray-500">Combined Reduction:</span> <span class="text-blue-600 dark:text-blue-400 font-bold">1 − [(R₁)(R₂)(R₃)...]</span></p>
+                </div>
+            </div>
+
+            <!-- Combined Examples -->
+            <div class="space-y-6">
+                <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h4 class="font-bold text-navy-900 dark:text-white mb-2"><span class="en-inline">Example 1: Factory Layered Protection</span><span class="ar-inline">مثال 1: الحماية الطبقاتية لمصنع</span></h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                        <span class="en-block">A factory installs four independent safety systems. The remaining risk after each system is:</span>
+                        <span class="ar-block">يثبت مصنع أربعة أنظمة سلامة مستقلة. المخاطر المتبقية بعد كل نظام هي:</span>
+                    </p>
+                    <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-1 mb-3">
+                        <li>• <span class="en-inline">System 1: 40% remaining</span><span class="ar-inline">النظام 1: 40% متبقية</span></li>
+                        <li>• <span class="en-inline">System 2: 25% remaining</span><span class="ar-inline">النظام 2: 25% متبقية</span></li>
+                        <li>• <span class="en-inline">System 3: 20% remaining</span><span class="ar-inline">النظام 3: 20% متبقية</span></li>
+                        <li>• <span class="en-inline">System 4: 10% remaining</span><span class="ar-inline">النظام 4: 10% متبقية</span></li>
+                    </ul>
+                    <button onclick="toggleMath('layer1')" class="w-full sm:w-auto py-2.5 px-6 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg transition text-sm flex items-center justify-center gap-2">
+                        <span class="en-inline">Reveal Solution</span>
+                        <span class="ar-inline">عرض الحل</span>
+                    </button>
+                    <div id="layer1" class="hidden mt-4 p-4 bg-gray-50 dark:bg-navy-900 rounded-xl math-block text-sm space-y-2 text-navy-900 dark:text-gray-200">
+                        <p>Combined Reduction = 1 − [(0.40)(0.25)(0.20)(0.10)]</p>
+                        <p>= 1 − [0.002] = <span class="text-blue-600 dark:text-blue-400 font-bold">0.998 = 99.8%</span></p>
+                        <p class="text-blue-600 dark:text-blue-400 pt-2 border-t border-gray-200 dark:border-gray-600">⚠️ Risk is reduced to 0.2%, but never to zero.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h4 class="font-bold text-navy-900 dark:text-white mb-2"><span class="en-inline">Example 2: Data Center Protection</span><span class="ar-inline">مثال 2: حماية مركز البيانات</span></h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                        <span class="en-block">A data center uses three independent risk control measures. After each measure, the remaining risk proportions are:</span>
+                        <span class="ar-block">يستخدم مركز بيانات ثلاثة تدابير مستقلة للتحكم في المخاطر. بعد كل تدبير، نسب المخاطر المتبقية هي:</span>
+                    </p>
+                    <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-1 mb-3">
+                        <li>• <span class="en-inline">Measure 1: 10% remaining risk</span><span class="ar-inline">التدبير 1: 10% مخاطر متبقية</span></li>
+                        <li>• <span class="en-inline">Measure 2: 25% remaining risk</span><span class="ar-inline">التدبير 2: 25% مخاطر متبقية</span></li>
+                        <li>• <span class="en-inline">Measure 3: 15% remaining risk</span><span class="ar-inline">التدبير 3: 15% مخاطر متبقية</span></li>
+                    </ul>
+                    <button onclick="toggleMath('layer2')" class="w-full sm:w-auto py-2.5 px-6 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg transition text-sm flex items-center justify-center gap-2">
+                        <span class="en-inline">Reveal Solution</span>
+                        <span class="ar-inline">عرض الحل</span>
+                    </button>
+                    <div id="layer2" class="hidden mt-4 p-4 bg-gray-50 dark:bg-navy-900 rounded-xl math-block text-sm space-y-2 text-navy-900 dark:text-gray-200">
+                        <p>Combined Reduction = 1 − [(0.10)(0.25)(0.15)]</p>
+                        <p>= 1 − [0.00375] = <span class="text-blue-600 dark:text-blue-400 font-bold">0.99625 = 99.6%</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TOPIC 6: RAROC                             -->
+        <!-- ========================================== -->
+        <section id="raroc" class="scroll-mt-20">
+            <div class="text-center mb-10">
+                <span class="inline-block px-4 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-xs font-bold rounded-full uppercase tracking-wider mb-3"><span class="en-inline">Topic 6</span><span class="ar-inline">الموضوع السادس</span></span>
+                <h2 class="text-3xl font-bold text-navy-900 dark:text-white">
+                    <span class="en-block">Risk-Adjusted Return on Capital (RAROC)</span>
+                    <span class="ar-block">العائد المعدل حسب المخاطر على رأس المال (RAROC)</span>
+                </h2>
+            </div>
+
+            <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-8">
+                <p class="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
+                    <span class="en-block"><span class="tooltip-trigger" data-tooltip="Measures return after accounting for expected loss and economic capital. Compare with cost of capital.">RAROC</span> measures return after accounting for expected loss and economic capital. Compare RAROC with the cost of capital:</span>
+                    <span class="ar-block"><span class="tooltip-trigger" data-tooltip="يقيس العائد بعد محاسبة الخسارة المتوقعة ورأس المال الاقتصادي. قارن RAROC مع تكلفة رأس المال.">RAROC</span> يقيس العائد بعد محاسبة الخسارة المتوقعة ورأس المال الاقتصادي. قارن RAROC مع تكلفة رأس المال:</span>
+                </p>
+                <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-300 mb-4">
+                    <li>• <span class="en-inline">If <strong>RAROC > Cost of Capital</strong>: the division <strong class="text-green-600 dark:text-green-400">creates value</strong></span><span class="ar-inline">إذا <strong>RAROC > تكلفة رأس المال</strong>: القسم <strong class="text-green-600 dark:text-green-400">يخلق قيمة</strong></span></li>
+                    <li>• <span class="en-inline">If <strong>RAROC < Cost of Capital</strong>: the division <strong class="text-red-600 dark:text-red-400">destroys value</strong></span><span class="ar-inline">إذا <strong>RAROC < تكلفة رأس المال</strong>: القسم <strong class="text-red-600 dark:text-red-400">يدمر قيمة</strong></span></li>
+                </ul>
+                <div class="math-block bg-gray-50 dark:bg-navy-900 p-4 rounded-xl text-sm text-navy-900 dark:text-gray-200">
+                    <p><span class="text-gray-500">RAROC:</span> <span class="text-red-600 dark:text-red-400 font-bold">(Expected Return − Expected Loss) / Economic Capital</span></p>
+                </div>
+            </div>
+
+            <!-- RAROC Examples -->
+            <div class="space-y-6">
+                <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h4 class="font-bold text-navy-900 dark:text-white mb-2"><span class="en-inline">Example 1: Division Analysis</span><span class="ar-inline">مثال 1: تحليل قسم</span></h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                        <span class="en-block">A division has the following financial data: Expected Return = $500,000, Expected Loss = $100,000, Economic Capital = $2,000,000, Cost of capital = 12%. Calculate the risk-adjusted return on capital (RAROC). Does the division create value?</span>
+                        <span class="ar-block">يحتوي قسم على البيانات المالية التالية: العائد المتوقع = 500,000 دولار، الخسارة المتوقعة = 100,000 دولار، رأس المال الاقتصادي = 2,000,000 دولار، تكلفة رأس المال = 12%. احسب العائد المعدل حسب المخاطر على رأس المال (RAROC). هل يخلق القسم قيمة؟</span>
+                    </p>
+                    <button onclick="toggleMath('raroc1')" class="w-full sm:w-auto py-2.5 px-6 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-lg transition text-sm flex items-center justify-center gap-2">
+                        <span class="en-inline">Reveal Solution</span>
+                        <span class="ar-inline">عرض الحل</span>
+                    </button>
+                    <div id="raroc1" class="hidden mt-4 p-4 bg-gray-50 dark:bg-navy-900 rounded-xl math-block text-sm space-y-2 text-navy-900 dark:text-gray-200">
+                        <p>RAROC = (500,000 − 100,000) / 2,000,000</p>
+                        <p>= 400,000 / 2,000,000 = <span class="text-red-600 dark:text-red-400 font-bold">20%</span></p>
+                        <p class="text-green-600 dark:text-green-400 pt-2 border-t border-gray-200 dark:border-gray-600">✅ <strong>Decision: Division CREATES value</strong> (RAROC 20% > Cost of Capital 12%)</p>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h4 class="font-bold text-navy-900 dark:text-white mb-2"><span class="en-inline">Example 2: Another Division</span><span class="ar-inline">مثال 2: قسم آخر</span></h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                        <span class="en-block">A division of a company has an expected return of $300,000, an expected loss of $60,000, and economic capital of $1,500,000. The cost of capital is 10%. Calculate the risk-adjusted return on capital (RAROC) and determine whether the division creates value.</span>
+                        <span class="ar-block">يحتوي قسم من شركة على عائد متوقع 300,000 دولار، خسارة متوقعة 60,000 دولار، ورأس مال اقتصادي 1,500,000 دولار. تكلفة رأس المال 10%. احسب العائد المعدل حسب المخاطر على رأس المال (RAROC) وحدد ما إذا كان القسم يخلق قيمة.</span>
+                    </p>
+                    <button onclick="toggleMath('raroc2')" class="w-full sm:w-auto py-2.5 px-6 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-lg transition text-sm flex items-center justify-center gap-2">
+                        <span class="en-inline">Reveal Solution</span>
+                        <span class="ar-inline">عرض الحل</span>
+                    </button>
+                    <div id="raroc2" class="hidden mt-4 p-4 bg-gray-50 dark:bg-navy-900 rounded-xl math-block text-sm space-y-2 text-navy-900 dark:text-gray-200">
+                        <p>RAROC = (300,000 − 60,000) / 1,500,000</p>
+                        <p>= 240,000 / 1,500,000 = <span class="text-red-600 dark:text-red-400 font-bold">16%</span></p>
+                        <p class="text-green-600 dark:text-green-400 pt-2 border-t border-gray-200 dark:border-gray-600">✅ <strong>Decision: Division CREATES value</strong> (RAROC 16% > Cost of Capital 10%)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- PERSONAL RISK MANAGEMENT: HLV              -->
+        <!-- ========================================== -->
+        <section id="hlv" class="scroll-mt-20">
+            <div class="text-center mb-10">
+                <span class="inline-block px-4 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs font-bold rounded-full uppercase tracking-wider mb-3"><span class="en-inline">Personal Risk</span><span class="ar-inline">المخاطر الشخصية</span></span>
+                <h2 class="text-3xl font-bold text-navy-900 dark:text-white">
+                    <span class="en-block">Human Life Value (HLV)</span>
+                    <span class="ar-block">القيمة البشرية للحياة (HLV)</span>
+                </h2>
+            </div>
+
+            <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-8">
+                <p class="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
+                    <span class="en-block"><span class="tooltip-trigger" data-tooltip="Estimates the present value of future net income contributed to family. The higher the net contribution and longer the time period, the higher the HLV.">Human Life Value (HLV)</span> estimates the present value of future net income contributed to family.</span>
+                    <span class="ar-block"><span class="tooltip-trigger" data-tooltip="تقدر القيمة الحالية لصافي الدخل المستقبلي المساهم به للعائلة. كلما زاد المساهمة الصافية وطالت الفترة الزمنية، ارتفعت HLV.">القيمة البشرية للحياة (HLV)</span> تقدر القيمة الحالية لصافي الدخل المستقبلي المساهم به للعائلة.</span>
+                </p>
+                <div class="math-block bg-gray-50 dark:bg-navy-900 p-4 rounded-xl text-sm text-navy-900 dark:text-gray-200">
+                    <p><span class="text-gray-500">HLV:</span> <span class="text-indigo-600 dark:text-indigo-400 font-bold">∑ Net Income / (1 + r)ᵗ</span></p>
+                </div>
+            </div>
+
+            <!-- HLV Examples -->
+            <div class="space-y-6">
+                <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h4 class="font-bold text-navy-900 dark:text-white mb-2"><span class="en-inline">Example 1: 35-Year-Old Professional</span><span class="ar-inline">مثال 1: محترف عمره 35 سنة</span></h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                        <span class="en-block">A 35-year-old professional earns $75,000 per year. Personal expenses are $25,000 per year, leaving a net contribution to the family of $50,000. The person plans to retire in 30 years. The appropriate discount rate is 5%. Calculate the human life value (HLV).</span>
+                        <span class="ar-block">محترف عمره 35 سنة يكسب 75,000 دولار سنوياً. النفقات الشخصية 25,000 دولار سنوياً، تاركاً مساهمة صافية للعائلة بقيمة 50,000 دولار. يخطط الشخص للتقاعد بعد 30 سنة. معدل الخصم المناسب 5%. احسب القيمة البشرية للحياة (HLV).</span>
+                    </p>
+                    <button onclick="toggleMath('hlv1')" class="w-full sm:w-auto py-2.5 px-6 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg transition text-sm flex items-center justify-center gap-2">
+                        <span class="en-inline">Reveal Solution</span>
+                        <span class="ar-inline">عرض الحل</span>
+                    </button>
+                    <div id="hlv1" class="hidden mt-4 p-4 bg-gray-50 dark:bg-navy-900 rounded-xl math-block text-sm space-y-2 text-navy-900 dark:text-gray-200">
+                        <p>Net Contribution = 75,000 − 25,000 = <span class="text-teal-600 dark:text-teal-400 font-bold">$50,000/year</span></p>
+                        <p>HLV = 50,000 / (1 + 0.05)³⁰ = <span class="text-indigo-600 dark:text-indigo-400 font-bold">$11,568.87</span></p>
+                        <p class="text-indigo-600 dark:text-indigo-400 pt-2 border-t border-gray-200 dark:border-gray-600">💡 This is the recommended amount of life insurance coverage.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h4 class="font-bold text-navy-900 dark:text-white mb-2"><span class="en-inline">Example 2: 40-Year-Old Professional</span><span class="ar-inline">مثال 2: محترف عمره 40 سنة</span></h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                        <span class="en-block">A 40-year-old professional earns a net contribution to his family of $60,000 per year. He plans to retire in 25 years. The appropriate discount rate is 6%. Calculate his human life value (HLV).</span>
+                        <span class="ar-block">محترف عمره 40 سنة يكسب مساهمة صافية لعائلته بقيمة 60,000 دولار سنوياً. يخطط للتقاعد بعد 25 سنة. معدل الخصم المناسب 6%. احسب قيمته البشرية للحياة (HLV).</span>
+                    </p>
+                    <button onclick="toggleMath('hlv2')" class="w-full sm:w-auto py-2.5 px-6 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg transition text-sm flex items-center justify-center gap-2">
+                        <span class="en-inline">Reveal Solution</span>
+                        <span class="ar-inline">عرض الحل</span>
+                    </button>
+                    <div id="hlv2" class="hidden mt-4 p-4 bg-gray-50 dark:bg-navy-900 rounded-xl math-block text-sm space-y-2 text-navy-900 dark:text-gray-200">
+                        <p>Net Contribution = <span class="text-teal-600 dark:text-teal-400 font-bold">$60,000/year</span></p>
+                        <p>HLV = 60,000 / (1 + 0.06)²⁵ = <span class="text-indigo-600 dark:text-indigo-400 font-bold">$13,979.91</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- MAIN MCQ QUIZ                              -->
+        <!-- ========================================== -->
+        <section id="mcq" class="scroll-mt-20">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-navy-900 dark:text-white mb-2">
+                    <span class="en-block">Chapter 3 MCQ Practice</span>
+                    <span class="ar-block">اختبار الفصل الثالث</span>
+                </h2>
+                <p class="text-gray-600 dark:text-gray-300"><span class="en-inline">Click an answer to see detailed feedback based on the text.</span><span class="ar-inline">انقر على إجابة لرؤية تغذية راجعة مفصلة بناءً على النص.</span></p>
+            </div>
+            <div class="max-w-4xl mx-auto space-y-6" id="mcq-container"></div>
+            <div class="text-center mt-8">
+                <div id="mcq-score" class="hidden mb-6 p-6 bg-navy-900 dark:bg-navy-800 text-white rounded-2xl max-w-md mx-auto shadow-lg">
+                    <p class="text-lg font-bold"><span class="en-inline">Your Score:</span><span class="ar-inline">نتيجتك:</span> <span id="mcq-score-num" class="text-teal-400 text-3xl">0</span> / <span id="mcq-total">10</span></p>
+                </div>
+                <button onclick="resetMCQ()" class="px-8 py-3 bg-navy-900 dark:bg-navy-700 hover:bg-navy-800 text-white font-semibold rounded-lg shadow-lg transition">
+                    <span class="en-inline">Reset Quiz</span>
+                    <span class="ar-inline">إعادة الاختبار</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- EXTERNAL QUIZ LINK -->
+        <section id="practice" class="scroll-mt-20">
+            <div class="bg-gradient-to-br from-navy-900 via-navy-800 to-teal-900 p-8 md:p-16 rounded-3xl text-white text-center shadow-2xl relative overflow-hidden">
+                <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-40"></div>
+                <div class="relative z-10 max-w-2xl mx-auto">
+                    <div class="w-16 h-16 bg-teal-500/20 border border-teal-500/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-8 h-8 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                        <span class="en-block">Want More Practice?</span>
+                        <span class="ar-block">هل تريد المزيد من التدريب؟</span>
+                    </h2>
+                    <p class="text-lg text-gray-300 mb-8">
+                        <span class="en-block">Visit our external quiz portal for additional questions, timed exams, and detailed performance analytics on Risk Management.</span>
+                        <span class="ar-block">زر بوابة الأسئلة الخارجية للحصول على أسئلة إضافية، امتحانات موقوتة، وتحليلات أداء مفصلة حول إدارة المخاطر.</span>
+                    </p>
+                    <a href="https://example.com/quiz-chapter-3" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-3 px-8 py-4 bg-teal-500 hover:bg-teal-400 text-white font-bold rounded-xl shadow-lg hover:shadow-teal-500/30 transition-all transform hover:-translate-y-1 text-lg">
+                        <span class="en-inline">Go to External Quiz Portal</span>
+                        <span class="ar-inline">الانتقال إلى بوابة الأسئلة الخارجية</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-navy-900 dark:bg-black text-gray-400 py-12 mt-24 border-t border-navy-800">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="flex items-center justify-center gap-2 mb-4">
+                <svg class="w-6 h-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                <span class="text-white font-bold text-lg">
+                    <span class="en-inline">Risk Management</span>
+                    <span class="ar-inline">إدارة المخاطر</span>
+                </span>
+            </div>
+            <p class="text-sm">
+                <span class="en-block">Academic Educational Resource. Interactive Edition.</span>
+                <span class="ar-block">مورد تعليمي أكاديمي. النسخة التفاعلية.</span>
+            </p>
+        </div>
+    </footer>
+
+    <button id="back-to-top" class="fixed bottom-8 right-8 p-3 bg-teal-600 hover:bg-teal-500 text-white rounded-full shadow-lg transition-all transform translate-y-20 opacity-0 z-50">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+    </button>
+
+    <script>
+        // --- UI & Navigation ---
+        const htmlEl = document.documentElement;
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if(mobileMenuBtn) mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+        document.querySelectorAll('#mobile-menu a').forEach(link => link.addEventListener('click', () => mobileMenu.classList.add('hidden')));
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / docHeight) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+            const btn = document.getElementById('back-to-top');
+            if (scrollTop > 500) { btn.classList.remove('translate-y-20', 'opacity-0'); btn.classList.add('translate-y-0', 'opacity-100'); }
+            else { btn.classList.add('translate-y-20', 'opacity-0'); btn.classList.remove('translate-y-0', 'opacity-100'); }
+        });
+        document.getElementById('back-to-top').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        function toggleDark() {
+            htmlEl.classList.toggle('dark');
+            const isDark = htmlEl.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            document.getElementById('icon-sun').classList.toggle('hidden', !isDark);
+            document.getElementById('icon-moon').classList.toggle('hidden', isDark);
+        }
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlEl.classList.add('dark');
+            document.getElementById('icon-sun').classList.remove('hidden');
+            document.getElementById('icon-moon').classList.add('hidden');
+        }
+        document.getElementById('dark-mode-btn').addEventListener('click', toggleDark);
+        document.getElementById('dark-mode-btn-mob').addEventListener('click', toggleDark);
+
+        function toggleLang() {
+            if (htmlEl.getAttribute('lang') === 'en') {
+                htmlEl.setAttribute('lang', 'ar'); htmlEl.setAttribute('dir', 'rtl');
+                document.getElementById('lang-label').textContent = 'EN'; document.getElementById('lang-label-mob').textContent = 'EN';
+            } else {
+                htmlEl.setAttribute('lang', 'en'); htmlEl.setAttribute('dir', 'ltr');
+                document.getElementById('lang-label').textContent = 'AR'; document.getElementById('lang-label-mob').textContent = 'AR';
+            }
+            renderMCQ();
+        }
+        document.getElementById('lang-toggle').addEventListener('click', toggleLang);
+        document.getElementById('lang-toggle-mob').addEventListener('click', toggleLang);
+
+        function toggleMath(id) { document.getElementById(id).classList.toggle('hidden'); }
+
+        // --- Micro Quiz Logic ---
+        function checkMicro(qId, btn, isCorrect) {
+            const container = document.getElementById(qId);
+            const feedback = document.getElementById(qId + '-feedback');
+            const isAr = htmlEl.getAttribute('lang') === 'ar';
+            container.querySelectorAll('button').forEach(b => {
+                b.disabled = true;
+                b.classList.remove('hover:bg-teal-100', 'dark:hover:bg-teal-900');
+                b.classList.add('opacity-60', 'cursor-not-allowed');
+            });
+            if (isCorrect) {
+                btn.classList.remove('bg-white', 'dark:bg-navy-700', 'border-gray-200', 'dark:border-gray-600');
+                btn.classList.add('bg-green-500', 'text-white', 'border-green-500', 'opacity-100');
+                feedback.className = 'mt-3 text-sm font-medium text-green-700 dark:text-green-400';
+                feedback.innerHTML = isAr ? '✅ <strong>صحيح!</strong> الرشاشات تقلل من شدة الخسارة بعد حدوثها (Loss Reduction)، وليس من تكرارها.' : '✅ <strong>Correct!</strong> Sprinklers reduce the severity of loss after it occurs (Loss Reduction), not the frequency.';
+            } else {
+                btn.classList.remove('bg-white', 'dark:bg-navy-700', 'border-gray-200', 'dark:border-gray-600');
+                btn.classList.add('bg-red-500', 'text-white', 'border-red-500', 'opacity-100');
+                feedback.className = 'mt-3 text-sm font-medium text-red-700 dark:text-red-400';
+                feedback.innerHTML = isAr ? '❌ <strong>خطأ.</strong> الإجابة الصحيحة هي Loss Reduction.' : '❌ <strong>Incorrect.</strong> The correct answer is Loss Reduction.';
+            }
+            feedback.classList.remove('hidden');
+        }
+
+        // --- Main MCQ Logic ---
+        const mcqData = [
+            { id: 'q1', q: 'Risk Management is defined as:', qAr: 'تُعرف إدارة المخاطر بأنها:', 
+              opts: { A: {en:'Avoiding all risks completely.',ar:'تجنب جميع المخاطر تماماً.'}, B: {en:'A process that identifies loss exposures and selects the most appropriate techniques for treating them.',ar:'عملية تحدد تعرضات الخسارة وتختار التقنيات الأنسب لمعالجتها.'}, C: {en:'Purchasing insurance for every possible loss.',ar:'شراء تأمين لكل خسارة محتملة.'}, D: {en:'Transferring all risks to the government.',ar:'نقل جميع المخاطر إلى الحكومة.'} }, 
+              correct: 'B', exp: {en:'Risk Management is a process that identifies loss exposures faced by an organization and selects the most appropriate techniques for treating such exposures.',ar:'إدارة المخاطر هي عملية تحدد تعرضات الخسارة التي تواجهها المنظمة وتختار التقنيات الأنسب لمعالجة هذه التعرضات.'} },
+            { id: 'q2', q: 'The Cost of Risk (COR) formula is:', qAr: 'معادلة تكلفة المخاطر (COR) هي:', 
+              opts: { A: {en:'Total Risk Costs / Revenue',ar:'إجمالي تكاليف المخاطر / الإيرادات'}, B: {en:'Revenue / Total Risk Costs',ar:'الإيرادات / إجمالي تكاليف المخاطر'}, C: {en:'Expected Loss × Frequency',ar:'الخسارة المتوقعة × التكرار'}, D: {en:'Premium / Severity',ar:'القسط / الشدة'} }, 
+              correct: 'A', exp: {en:'COR = Total Risk Costs (premiums + retained losses + control costs + admin costs) / Revenue.',ar:'COR = إجمالي تكاليف المخاطر (الأقساط + الخسائر المحتفظ بها + تكاليف التحكم + التكاليف الإدارية) / الإيرادات.'} },
+            { id: 'q3', q: 'Which of the following is a Risk Control technique?', qAr: 'أي مما يلي يُعد من تقنيات التحكم في المخاطر؟', 
+              opts: { A: {en:'Retention',ar:'الاحتفاظ'}, B: {en:'Commercial Insurance',ar:'التأمين التجاري'}, C: {en:'Loss Prevention',ar:'منع الخسارة'}, D: {en:'Hedging',ar:'التحوط'} }, 
+              correct: 'C', exp: {en:'Loss Prevention is a Risk Control technique that reduces the frequency of losses. Retention, Insurance, and Hedging are Risk Financing techniques.',ar:'منع الخسارة هو تقنية تحكم في المخاطر تقلل من تكرار الخسائر. الاحتفاظ، التأمين، والتحوط هي تقنيات تمويل المخاطر.'} },
+            { id: 'q4', q: 'Installing an automatic sprinkler system is an example of:', qAr: 'تركيب نظام رشاشات تلقائية هو مثال على:', 
+              opts: { A: {en:'Avoidance',ar:'التجنب'}, B: {en:'Loss Prevention',ar:'منع الخسارة'}, C: {en:'Loss Reduction',ar:'تقليل الخسارة'}, D: {en:'Retention',ar:'الاحتفاظ'} }, 
+              correct: 'C', exp: {en:'Loss Reduction refers to measures that reduce the severity of a loss after it occurs. Sprinklers do not prevent fire, but reduce its severity.',ar:'تقليل الخسارة يشير إلى الإجراءات التي تقلل من شدة الخسارة بعد حدوثها. الرشاشات لا تمنع الحريق، ولكن تقلل من شدته.'} },
+            { id: 'q5', q: 'The Co-Insurance formula for insurer payment is:', qAr: 'معادلة دفع شركة التأمين للتأمين المشترك هي:', 
+              opts: { A: {en:'Loss × (Insurance Purchased / Insurance Required)',ar:'الخسارة × (التأمين المشتري / التأمين المطلوب)'}, B: {en:'Loss − Deductible',ar:'الخسارة − الخصم'}, C: {en:'Property Value × Coinsurance %',ar:'قيمة الممتلكات × نسبة التأمين المشترك'}, D: {en:'Loss + Premium',ar:'الخسارة + القسط'} }, 
+              correct: 'A', exp: {en:'Payment = Loss × (Insurance Purchased / Insurance Required). If insured buys less than required, payment is reduced proportionally.',ar:'الدفع = الخسارة × (التأمين المشتري / التأمين المطلوب). إذا اشترى المؤمن له أقل من المطلوب، يتم تقليل الدفع بشكل متناسب.'} },
+            { id: 'q6', q: 'Net Benefit of a loss prevention program is calculated as:', qAr: 'يتم حساب الفائدة الصافية لبرنامج منع الخسارة على النحو التالي:', 
+              opts: { A: {en:'Prevention Cost − E(L)before',ar:'تكلفة المنع − E(L)قبل'}, B: {en:'[E(L)before − E(L)after] − Prevention Cost',ar:'[E(L)قبل − E(L)بعد] − تكلفة المنع'}, C: {en:'Severity × Frequency',ar:'الشدة × التكرار'}, D: {en:'Premium − Deductible',ar:'القسط − الخصم'} }, 
+              correct: 'B', exp: {en:'Net Benefit = [E(L)before − E(L)after] − Prevention Cost. Implement if positive; do not implement if negative.',ar:'الفائدة الصافية = [E(L)قبل − E(L)بعد] − تكلفة المنع. نفذ إذا كانت موجبة؛ لا تنفذ إذا كانت سالبة.'} },
+            { id: 'q7', q: 'Combined Risk Reduction formula for layered protection is:', qAr: 'معادلة تقليل المخاطر المدمج للحماية الطبقاتية هي:', 
+              opts: { A: {en:'R₁ + R₂ + R₃',ar:'R₁ + R₂ + R₃'}, B: {en:'1 − [(R₁)(R₂)(R₃)...]',ar:'1 − [(R₁)(R₂)(R₃)...]'}, C: {en:'R₁ × R₂ × R₃',ar:'R₁ × R₂ × R₃'}, D: {en:'(R₁ + R₂) / 2',ar:'(R₁ + R₂) / 2'} }, 
+              correct: 'B', exp: {en:'Combined Reduction = 1 − [(R₁)(R₂)(R₃)...]. Layering can greatly reduce risk, but never to exactly zero.',ar:'التقليل المدمج = 1 − [(R₁)(R₂)(R₃)...]. الطبقاتية يمكن أن تقلل المخاطر بشكل كبير، ولكن أبداً إلى الصفر تماماً.'} },
+            { id: 'q8', q: 'RAROC formula is:', qAr: 'معادلة RAROC هي:', 
+              opts: { A: {en:'Expected Return / Economic Capital',ar:'العائد المتوقع / رأس المال الاقتصادي'}, B: {en:'(Expected Return − Expected Loss) / Economic Capital',ar:'(العائد المتوقع − الخسارة المتوقعة) / رأس المال الاقتصادي'}, C: {en:'Expected Loss / Expected Return',ar:'الخسارة المتوقعة / العائد المتوقع'}, D: {en:'Economic Capital / Expected Return',ar:'رأس المال الاقتصادي / العائد المتوقع'} }, 
+              correct: 'B', exp: {en:'RAROC = (Expected Return − Expected Loss) / Economic Capital. Compare with cost of capital to determine if division creates value.',ar:'RAROC = (العائد المتوقع − الخسارة المتوقعة) / رأس المال الاقتصادي. قارن مع تكلفة رأس المال لتحديد ما إذا كان القسم يخلق قيمة.'} },
+            { id: 'q9', q: 'If RAROC > Cost of Capital, the division:', qAr: 'إذا كان RAROC > تكلفة رأس المال، فإن القسم:', 
+              opts: { A: {en:'Destroys value',ar:'يدمر قيمة'}, B: {en:'Creates value',ar:'يخلق قيمة'}, C: {en:'Breaks even',ar:'يحقق التعادل'}, D: {en:'Should be shut down',ar:'يجب إغلاقه'} }, 
+              correct: 'B', exp: {en:'If RAROC > Cost of Capital, the division creates value. If RAROC < Cost of Capital, it destroys value.',ar:'إذا كان RAROC > تكلفة رأس المال، فإن القسم يخلق قيمة. إذا كان RAROC < تكلفة رأس المال، فإنه يدمر قيمة.'} },
+            { id: 'q10', q: 'Human Life Value (HLV) estimates:', qAr: 'القيمة البشرية للحياة (HLV) تقدر:', 
+              opts: { A: {en:'The total cost of insurance premiums',ar:'التكلفة الإجمالية لأقساط التأمين'}, B: {en:'The present value of future net income contributed to family',ar:'القيمة الحالية لصافي الدخل المستقبلي المساهم به للعائلة'}, C: {en:'The severity of a potential loss',ar:'شدة الخسارة المحتملة'}, D: {en:'The frequency of losses',ar:'تكرار الخسائر'} }, 
+              correct: 'B', exp: {en:'HLV estimates the present value of future net income contributed to family. The higher the net contribution and longer the time period, the higher the HLV.',ar:'HLV تقدر القيمة الحالية لصافي الدخل المستقبلي المساهم به للعائلة. كلما زاد المساهمة الصافية وطالت الفترة الزمنية، ارتفعت HLV.'} }
+        ];
+
+        const mcqContainer = document.getElementById('mcq-container');
+        let mcqAnswered = 0, mcqCorrect = 0;
+        document.getElementById('mcq-total').textContent = mcqData.length;
+
+        function renderMCQ() {
+            mcqContainer.innerHTML = ''; mcqAnswered = 0; mcqCorrect = 0;
+            document.getElementById('mcq-score').classList.add('hidden');
+            const isAr = htmlEl.getAttribute('lang') === 'ar';
+
+            mcqData.forEach((q, i) => {
+                let optsHTML = '';
+                for (const [k, v] of Object.entries(q.opts)) {
+                    optsHTML += `<button onclick="checkMCQ('${q.id}', '${k}', '${q.correct}')" class="mcq-opt w-full text-left p-4 rounded-xl border-2 border-gray-200 dark:border-gray-600 hover:border-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 transition text-sm font-medium text-gray-700 dark:text-gray-200 flex items-center gap-3" data-key="${k}">
+                        <span class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-navy-700 text-gray-600 dark:text-gray-300 font-bold text-sm flex-shrink-0">${k}</span>
+                        <span>${isAr ? v.ar : v.en}</span>
+                    </button>`;
+                }
+                const el = document.createElement('div');
+                el.className = 'bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700';
+                el.id = `mcq-${q.id}`;
+                el.innerHTML = `
+                    <div class="flex items-start gap-4 mb-4">
+                        <span class="flex-shrink-0 w-10 h-10 bg-navy-900 dark:bg-navy-700 text-white rounded-full flex items-center justify-center font-bold text-sm">${i + 1}</span>
+                        <h4 class="text-lg font-bold text-navy-900 dark:text-white pt-1.5">${isAr ? q.qAr : q.q}</h4>
+                    </div>
+                    <div class="space-y-3 mb-4">${optsHTML}</div>
+                    <div id="fb-${q.id}" class="hidden p-4 rounded-xl text-sm font-medium mt-4"></div>`;
+                mcqContainer.appendChild(el);
+            });
+        }
+
+        function checkMCQ(qId, sel, cor) {
+            const el = document.getElementById(`mcq-${qId}`);
+            const btns = el.querySelectorAll('.mcq-opt');
+            const fb = document.getElementById(`fb-${qId}`);
+            if (btns[0].disabled) return;
+
+            mcqAnswered++;
+            if (sel === cor) mcqCorrect++;
+            const qData = mcqData.find(q => q.id === qId);
+            const isAr = htmlEl.getAttribute('lang') === 'ar';
+
+            btns.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('hover:border-teal-400', 'hover:bg-teal-50', 'dark:hover:bg-teal-900/20');
+                btn.classList.add('cursor-not-allowed', 'opacity-80');
+                const k = btn.getAttribute('data-key');
+                const icon = btn.querySelector('span:first-child');
+                if (k === cor) {
+                    btn.classList.remove('border-gray-200', 'dark:border-gray-600');
+                    btn.classList.add('border-green-500', 'bg-green-50', 'dark:bg-green-900/20', 'text-green-800', 'dark:text-green-300');
+                    icon.classList.remove('bg-gray-100', 'dark:bg-navy-700', 'text-gray-600', 'dark:text-gray-300');
+                    icon.classList.add('bg-green-500', 'text-white');
+                    icon.innerHTML = '✓';
+                } else if (k === sel && sel !== cor) {
+                    btn.classList.remove('border-gray-200', 'dark:border-gray-600');
+                    btn.classList.add('border-red-500', 'bg-red-50', 'dark:bg-red-900/20', 'text-red-800', 'dark:text-red-300');
+                    icon.classList.remove('bg-gray-100', 'dark:bg-navy-700', 'text-gray-600', 'dark:text-gray-300');
+                    icon.classList.add('bg-red-500', 'text-white');
+                    icon.innerHTML = '✕';
+                }
+            });
+
+            fb.classList.remove('hidden');
+            if (sel === cor) {
+                fb.className = 'p-4 rounded-xl text-sm font-medium mt-4 bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-800';
+                fb.innerHTML = `✅ <strong>${isAr ? 'إجابة صحيحة!' : 'Correct!'}</strong> ${isAr ? qData.exp.ar : qData.exp.en}`;
+            } else {
+                fb.className = 'p-4 rounded-xl text-sm font-medium mt-4 bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800';
+                fb.innerHTML = `❌ <strong>${isAr ? 'إجابة خاطئة.' : 'Incorrect.'}</strong> ${isAr ? `الإجابة الصحيحة هي <strong>${cor}</strong>.` : `The correct answer is <strong>${cor}</strong>.`} ${isAr ? qData.exp.ar : qData.exp.en}`;
+            }
+
+            if (mcqAnswered === mcqData.length) {
+                const scoreEl = document.getElementById('mcq-score');
+                scoreEl.classList.remove('hidden');
+                document.getElementById('mcq-score-num').textContent = mcqCorrect;
+            }
+        }
+
+        function resetMCQ() { renderMCQ(); document.getElementById('mcq').scrollIntoView({ behavior: 'smooth' }); }
+        renderMCQ();
+    </script>
+</body>
+</html>
